@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nivel 1: Lenguaje Algebraico (Modo Aleatorio)</title>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-light: #e0e7ff;
+            --accent: #0ea5e9;
+            --accent-light: #e0f2fe;
+            --background: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #0f172a;
+            --text-muted: #475569;
+            --border: #e2e8f0;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+        body { background-color: var(--background); color: var(--text); padding: 20px; line-height: 1.5; }
+        .container { max-width: 850px; margin: 0 auto; }
+        
+        .back-link { display: inline-flex; align-items: center; text-decoration: none; color: var(--primary); font-weight: 600; margin-bottom: 20px; font-size: 0.95rem; }
+        h2 { font-size: 1.8rem; margin-bottom: 25px; color: var(--text); display: flex; align-items: center; gap: 10px; }
+        
+        /* Pestañas */
+        .tabs { display: flex; gap: 10px; margin-bottom: 25px; border-bottom: 2px solid var(--border); padding-bottom: 10px; }
+        .tab-btn { padding: 10px 20px; border: none; background: none; font-size: 1rem; font-weight: 600; color: var(--text-muted); cursor: pointer; border-radius: 8px; transition: all 0.2s; }
+        .tab-btn.active { background-color: var(--primary); color: white; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* Teoría */
+        .theory-section { background: var(--card-bg); padding: 25px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02); }
+        .theory-block { margin-bottom: 25px; padding-bottom: 20px; border-bottom: 1px dashed var(--border); }
+        .theory-block:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+        .theory-block h3 { color: var(--primary); margin-bottom: 10px; font-size: 1.25rem; }
+        .example-box { background-color: #fafafa; border-left: 4px solid var(--accent); padding: 12px; margin: 10px 0; border-radius: 0 8px 8px 0; font-style: italic; }
+
+        /* Contenedor del Generador de Ejercicios Dinámicos */
+        .generator-container { background: var(--card-bg); border-radius: 16px; border: 1px solid var(--border); padding: 30px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); position: relative; }
+        
+        /* Control de sesión y progreso */
+        .session-info { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; font-size: 0.9rem; color: var(--text-muted); font-weight: 600; }
+        .progress-bar-bg { background-color: var(--border); height: 6px; width: 100%; border-radius: 3px; margin-bottom: 25px; overflow: hidden; }
+        .progress-bar-fill { background-color: var(--accent); height: 100%; width: 0%; transition: width 0.3s ease; }
+
+        /* Tarjeta del Ejercicio Activo */
+        .active-exercise-box { min-height: 180px; }
+        .exercise-meta { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; }
+        .exercise-id { font-weight: 700; color: var(--primary); font-size: 0.85rem; background: var(--primary-light); padding: 3px 10px; border-radius: 6px; }
+        .exercise-text { font-size: 1.25rem; font-weight: 600; margin-bottom: 25px; color: #1e293b; line-height: 1.6; }
+        
+        /* Botoneras */
+        .interaction-area { display: flex; justify-content: space-between; align-items: center; gap: 15px; flex-wrap: wrap; border-top: 1px solid var(--border); padding-top: 20px; margin-top: 25px; }
+        .sub-actions { display: flex; gap: 10px; }
+        
+        .btn-base { padding: 10px 20px; border: 1px solid var(--border); border-radius: 8px; font-weight: 600; font-size: 0.9rem; cursor: pointer; transition: all 0.2s; }
+        .btn-hint { background: #f1f5f9; color: var(--text-muted); }
+        .btn-hint:hover { background: var(--accent-light); color: #0369a1; border-color: var(--accent); }
+        .btn-solution { background: #f1f5f9; color: var(--text-muted); }
+        .btn-solution:hover { background: #d1fae5; color: #065f46; border-color: #a7f3d0; }
+        
+        .btn-next { background-color: var(--primary); color: white; border: none; box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2); }
+        .btn-next:hover { background-color: #4338ca; transform: translateX(2px); }
+
+        /* Cajas de Feedback Ocultas */
+        .info-box { display: none; margin-top: 20px; padding: 15px; border-radius: 10px; font-size: 1rem; animation: slideDown 0.25s ease-out; line-height: 1.6; }
+        .hint-box { background-color: var(--accent-light); color: #0369a1; border-left: 5px solid var(--accent); }
+        .solution-box { background-color: #f0fdf4; color: #166534; border-left: 5px solid #22c55e; }
+        
+        .math-style { font-family: 'Times New Roman', Times, serif; font-style: italic; font-weight: bold; font-size: 1.25rem; color: #1e293b; }
+
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <a href="../index.html" class="back-link">← Volver al Índice Principal</a>
+    
+    <h2>Nivel 1: Lenguaje Algebraico y Monomios</h2>
+    
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('practica')">🏋️ Entrenador Aleatorio</button>
+        <button class="tab-btn" onclick="switchTab('teoria')">📖 Contenidos Teóricos</button>
+    </div>
+
+    <div id="teoria" class="tab-content">
+        <div class="theory-section">
+            <div class="theory-block">
+                <h3>1. El Lenguaje Algebraico</h3>
+                <p>Sirve para expresar números desconocidos utilizando letras (<span class="math-style">x</span>, <span class="math-style">y</span>, <span class="math-style">n</span>...). Permite traducir frases cotidianas a operaciones matemáticas.</p>
+                <div class="example-box">"El triple de un número más cinco" se traduce como: <span class="math-style">3x + 5</span></div>
+            </div>
+            <div class="theory-block">
+                <h3>2. ¿Qué es un Monomio?</h3>
+                <p>Es el producto de un número (llamado <strong>Coeficiente</strong>) por una o varias letras con exponentes (llamado <strong>Parte Literal</strong>).</p>
+                <p>El <strong>Grado</strong> es la suma de los exponentes de todas las letras que aparecen en la parte literal.</p>
+                <div class="example-box">En el monomio <span class="math-style">-5x²y³</span>:<br>• Coeficiente = <span class="math-style">-5</span><br>• Parte Literal = <span class="math-style">x²y³</span><br>• Grado = <span class="math-style">2 + 3 = 5</span></div>
+            </div>
+            <div class="theory-block">
+                <h3>3. El Valor Numérico</h3>
+                <p>Es el número final que se obtiene cuando sustituyes las letras por números reales y haces los cálculos correspondientes respetando la jerarquía.</p>
+                <div class="example-box">Calcula el valor numérico de <span class="math-style">2x + 7</span> si <span class="math-style">x = 3</span>:<br><span class="math-style">2 · (3) + 7 = 6 + 7 = 13</span></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="practica" class="tab-content active">
+        <div class="generator-container">
+            
+            <div class="session-info">
+                <span>Modo Entrenamiento Activo</span>
+                <span id="counter-display">Ejercicios vistos: 0 / 25</span>
+            </div>
+            
+            <div class="progress-bar-bg">
+                <div id="progress-fill" class="progress-bar-fill"></div>
+            </div>
+
+            <div class="active-exercise-box">
+                <div class="exercise-meta">
+                    <span id="ex-number" class="exercise-id">Ejercicio --</span>
+                </div>
+                <div id="ex-text" class="exercise-text">Cargando retos matemáticos...</div>
+            </div>
+
+            <div id="hint-panel" class="info-box hint-box"></div>
+            <div id="solution-panel" class="info-box solution-box"></div>
+
+            <div class="interaction-area">
+                <div class="sub-actions">
+                    <button class="btn-base btn-hint" onclick="showHint()">💡 Ver Pista</button>
+                    <button class="btn-base btn-solution" onclick="showSolution()">📝 Solución Paso a Paso</button>
+                </div>
+                <button class="btn-base btn-next" onclick="loadNextExercise()">Saltar Ejercicio ➡️</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    // BANCO DE DATOS DE LOS 25 EJERCICIOS DEL NIVEL 1
+    const database = [
+        { id: 1, text: 'Expresa en lenguaje algebraico: "El doble de un número x disminuido en 7 unidades".', hint: '"El doble" significa multiplicar por 2. "Disminuido" significa restar.', sol: '<strong>Respuesta:</strong> <span class="math-style">2x - 7</span><br>• Paso 1: El doble del número es <span class="math-style">2x</span>.<br>• Paso 2: Le restamos las 7 unidades obteniendo <span class="math-style">2x - 7</span>.' },
+        { id: 2, text: 'Expresa en lenguaje algebraico: "La mitad de un número a más su triple".', hint: 'La mitad se representa dividiendo entre 2. El triple significa multiplicar por 3 el mismo número.', sol: '<strong>Respuesta:</strong> <span class="math-style">(a/2) + 3a</span><br>• Paso 1: Expresamos la mitad de a como <span class="math-style">a/2</span>.<br>• Paso 2: Sumamos el triple, que es <span class="math-style">3a</span>. Resultado: <span class="math-style">(a/2) + 3a</span>.' },
+        { id: 3, text: 'Expresa matemáticamente: "El siguiente de un número entero n".', hint: 'Piensa en un número, por ejemplo el 5. Su siguiente es el 6. ¿Qué operación le haces al 5 para llegar al 6?', sol: '<strong>Respuesta:</strong> <span class="math-style">n + 1</span><br>• Paso 1: Para hallar el consecutivo o siguiente de cualquier número entero, solo hay que sumarle una unidad (<span class="math-style">n + 1</span>).' },
+        { id: 4, text: 'Expresa en lenguaje algebraico: "El cuadrado de un número más cinco".', hint: 'El cuadrado significa elevar ese número (puedes usar la letra x) al exponente 2.', sol: '<strong>Respuesta:</strong> <span class="math-style">x² + 5</span><br>• Paso 1: Traducimos "el cuadrado" como <span class="math-style">x²</span>.<br>• Paso 2: Añadimos las cinco unidades: <span class="math-style">x² + 5</span>.' },
+        { id: 5, text: 'Traduce a álgebra: "El precio de x kilogramos de manzanas si cada kilo cuesta 2,50€".', hint: 'Si compras 3 kg, multiplicas 3 por 2,50. Si compras x kg, realiza la misma operación.', sol: '<strong>Respuesta:</strong> <span class="math-style">2,50x</span><br>• Paso 1: Multiplicamos el coste fijo (2,50) por la cantidad variable (x). En álgebra se escribe unido: <span class="math-style">2,50x</span>.' },
+        { id: 6, text: 'Expresa en lenguaje algebraico: "La suma de dos números consecutivos".', hint: 'Si el primer número es x, su consecutivo inmediato es (x + 1). Júntalos mediante una suma.', sol: '<strong>Respuesta:</strong> <span class="math-style">2x + 1</span><br>• Paso 1: Planteamos la suma: <span class="math-style">x + (x + 1)</span>.<br>• Paso 2: Agrupamos las letras semejantes: <span class="math-style">x + x = 2x</span>. El resultado final simplificado es <span class="math-style">2x + 1</span>.' },
+        { id: 7, text: 'Traduce: "La edad de un padre es el triple que la de su hijo x, más 4 años". ¿Cuál es la edad del padre?', hint: 'Empieza escribiendo el triple de la edad del hijo. Luego añade los 4 años adicionales.', sol: '<strong>Respuesta:</strong> <span class="math-style">3x + 4</span><br>• Paso 1: La edad del hijo es x. Su triple es <span class="math-style">3x</span>.<br>• Paso 2: Sumamos los 4 años extra: <span class="math-style">3x + 4</span>.' },
+        { id: 8, text: 'Expresa algebraicamente: "El cubo de un número menos su doble".', hint: 'El "cubo" significa elevar al exponente 3. El "doble" es multiplicar el número por 2.', sol: '<strong>Respuesta:</strong> <span class="math-style">x³ - 2x</span><br>• Paso 1: El cubo de un número es <span class="math-style">x³</span>.<br>• Paso 2: Le restamos su propio doble (<span class="math-style">2x</span>), resultando <span class="math-style">x³ - 2x</span>.' },
+        { id: 9, text: 'Traduce: "El perímetro de un triángulo equilátero de lado L".', hint: 'Un triángulo equilátero tiene sus tres lados iguales. El perímetro es la suma de todos sus lados.', sol: '<strong>Respuesta:</strong> <span class="math-style">3L</span><br>• Paso 1: Perímetro = L + L + L.<br>• Paso 2: Como los tres términos son idénticos y se suman: <span class="math-style">3L</span>.' },
+        { id: 10, text: 'Expresa en lenguaje algebraico: "Restar 10 al triple de un número y".', hint: '¡Cuidado con el orden! Primero necesitas tener calculado el triple del número y luego quitarle las 10 unidades.', sol: '<strong>Respuesta:</strong> <span class="math-style">3y - 10</span><br>• Paso 1: Escribimos el triple de y, que es <span class="math-style">3y</span>.<br>• Paso 2: Le restamos 10 unidades: <span class="math-style">3y - 10</span>.' },
+        { id: 11, text: 'Identifica el coeficiente, la parte literal y el grado del monomio: <span class="math-style">7x³</span>.', hint: 'El coeficiente es el número delantero. El grado es el exponente principal de la variable.', sol: '<strong>Respuesta:</strong> Coeficiente: 7 | P. Literal: <span class="math-style">x³</span> | Grado: 3<br>• El número es 7. Las letras son <span class="math-style">x³</span>. Al tener solo ese exponente, el grado global es 3.' },
+        { id: 12, text: 'Identifica el coeficiente, parte literal y grado de: <span class="math-style">-4a²b⁵</span>.', hint: '¡No olvides arrastrar el signo menos del número! Para hallar el grado, suma los exponentes de a y b.', sol: '<strong>Respuesta:</strong> Coeficiente: -4 | P. Literal: <span class="math-style">a²b⁵</span> | Grado: 7<br>• Coeficiente: -4.<br>• Parte Literal: <span class="math-style">a²b⁵</span>.<br>• Grado: Sumamos los exponentes de todas las letras: <span class="math-style">2 + 5 = 7</span>.' },
+        { id: 13, text: 'Identifica el coeficiente, la parte literal y el grado del monomio: <span class="math-style">x⁴</span>.', hint: 'Cuando no hay ningún número visible delante de la variable, equivale matemáticamente a estar multiplicado por...', sol: '<strong>Respuesta:</strong> Coeficiente: 1 | P. Literal: <span class="math-style">x⁴</span> | Grado: 4<br>• Al estar la letra sola, su coeficiente oculto es 1 (<span class="math-style">1 · x⁴ = x⁴</span>). El exponente es 4.' },
+        { id: 14, text: 'Identifica los elementos del monomio: <span class="math-style">-x</span>.', hint: 'Hay un signo menos pero falta la cifra. Además, si una letra no lleva un exponente arriba, de forma invisible es...', sol: '<strong>Respuesta:</strong> Coeficiente: -1 | P. Literal: <span class="math-style">x</span> | Grado: 1<br>• El signo menos indica <span class="math-style">-1</span>. La letra x sola equivale a <span class="math-style">x¹</span>, por lo que su grado es 1.' },
+        { id: 15, text: 'Determina el coeficiente, parte literal y grado de: <span class="math-style">3xy</span>.', hint: 'Hay dos variables distintas. Ninguna lleva exponente explícito, lo que significa que el exponente de cada una es 1.', sol: '<strong>Respuesta:</strong> Coeficiente: 3 | P. Literal: <span class="math-style">xy</span> | Grado: 2<br>• Coeficiente: 3.<br>• Parte Literal: <span class="math-style">xy</span>.<br>• Grado: Cada letra aporta exponente 1 (<span class="math-style">x¹y¹</span>). Sumamos: <span class="math-style">1 + 1 = 2</span>.' },
+        { id: 16, text: 'Analiza el número aislado <span class="math-style">8</span>. ¿Se considera un monomio? ¿Cuáles son sus elementos?', hint: 'Cualquier número suelto es un monomio de grado cero ya que las letras no tienen fuerza (exponente cero).', sol: '<strong>Respuesta:</strong> Coeficiente: 8 | P. Literal: No tiene | Grado: 0<br>• Un número entero se denomina término independiente. Equivale a <span class="math-style">8x⁰</span>. Como <span class="math-style">x⁰ = 1</span>, el grado es 0.' },
+        { id: 17, text: 'Identifica los elementos de la fracción monómica: <span class="math-style">(3/4)x²y</span>.', hint: 'Los coeficientes numéricos pueden tener forma de fracción perfectamente. Agrúpalo como un solo bloque.', sol: '<strong>Respuesta:</strong> Coeficiente: 3/4 | P. Literal: <span class="math-style">x²y</span> | Grado: 3<br>• Coeficiente: <span class="math-style">3/4</span>.<br>• Parte literal: <span class="math-style">x²y</span>.<br>• Grado: Sumamos el exponente 2 de la x y el exponente 1 implícito de la y (<span class="math-style">2 + 1 = 3</span>).' },
+        { id: 18, text: '¿Cuál es el grado y el coeficiente de <span class="math-style">-abc</span>?', hint: 'Hay tres letras distintas agrupadas en multiplicación. Cada una de ellas aporta un grado a la suma total.', sol: '<strong>Respuesta:</strong> Coeficiente: -1 | P. Literal: <span class="math-style">abc</span> | Grado: 3<br>• Coeficiente: -1.<br>• Grado: Sumamos los exponentes individuales (<span class="math-style">1 + 1 + 1 = 3</span>).' },
+        { id: 19, text: 'Halla el valor numérico de la expresión <span class="math-style">3x + 4</span> cuando la variable <span class="math-style">x = 2</span>.', hint: 'Sustituye la x por un 2, realiza la multiplicación del coeficiente y luego la suma.', sol: '<strong>Respuesta:</strong> 10<br>• Paso 1: Sustitución: <span class="math-style">3 · (2) + 4</span>.<br>• Paso 2: Multiplicamos primero: <span class="math-style">6 + 4</span>.<br>• Paso 3: Sumamos: <span class="math-style">10</span>.' },
+        { id: 20, text: 'Calcula el valor numérico de <span class="math-style">x² - 5</span> para el valor <span class="math-style">x = 4</span>.', hint: 'Calcula de manera prioritaria la potencia (el cuadrado de 4) y luego haz la resta.', sol: '<strong>Respuesta:</strong> 11<br>• Paso 1: Sustituimos la base: <span class="math-style">(4)² - 5</span>.<br>• Paso 2: Potencia (<span class="math-style">4 · 4 = 16</span>): <span class="math-style">16 - 5</span>.<br>• Paso 3: Operamos: <span class="math-style">11</span>.' },
+        { id: 21, text: 'Calcula el valor numérico del monomio <span class="math-style">-2x³</span> si <span class="math-style">x = 3</span>.', hint: 'La potencia tiene prioridad máxima. Resuelve primero cuánto da el cubo de 3.', sol: '<strong>Respuesta:</strong> -54<br>• Paso 1: Sustitución: <span class="math-style">-2 · (3)³</span>.<br>• Paso 2: Desarrollamos el cubo (<span class="math-style">3 · 3 · 3 = 27</span>), quedando <span class="math-style">-2 · 27</span>.<br>• Paso 3: Multiplicamos: <span class="math-style">-54</span>.' },
+        { id: 22, text: 'Halla el valor numérico de la expresión <span class="math-style">5a - 2b</span> sabiendo que <span class="math-style">a = 3</span> y <span class="math-style">b = 4</span>.', hint: 'Sustituye cada letra por su número correspondiente. Tendrás dos multiplicaciones unidas por una resta.', sol: '<strong>Respuesta:</strong> 7<br>• Paso 1: Reemplazo: <span class="math-style">5 · (3) - 2 · (4)</span>.<br>• Paso 2: Productos: <span class="math-style">15 - 8</span>.<br>• Paso 3: Operación final: <span class="math-style">7</span>.' },
+        { id: 23, text: 'Encuentra el valor numérico de <span class="math-style">2x² + 3x</span> cuando la variable toma un valor negativo: <span class="math-style">x = -1</span>.', hint: '¡Ojo a la regla de signos! Un número negativo elevado a un exponente par se transforma en positivo.', sol: '<strong>Respuesta:</strong> -1<br>• Paso 1: Planteamiento: <span class="math-style">2 · (-1)² + 3 · (-1)</span>.<br>• Paso 2: Potencia par: <span class="math-style">2 · (1) + 3 · (-1)</span>.<br>• Paso 3: Multiplicaciones: <span class="math-style">2 - 3 = -1</span>.' },
+        { id: 24, text: 'Determina el valor numérico de <span class="math-style">3abc</span> cuando <span class="math-style">a = 2</span>, <span class="math-style">b = 5</span> y <span class="math-style">c = 0</span>.', hint: 'Observa el valor asignado a la letra c. ¿Qué pasa al multiplicar en cadena por cero?', sol: '<strong>Respuesta:</strong> 0<br>• Paso 1: Multiplicación completa: <span class="math-style">3 · 2 · 5 · 0</span>.<br>• Paso 2: La presencia del cero en los factores anula el producto entero automáticamente: <span class="math-style">0</span>.' },
+        { id: 25, text: 'Calcula el valor numérico de la expresión con paréntesis <span class="math-style">3 · (x + 5)</span> si <span class="math-style">x = 4</span>.', hint: 'Por jerarquía, debes resolver en primer lugar la suma que está protegida en el paréntesis.', sol: '<strong>Respuesta:</strong> 27<br>• Paso 1: Colocamos el valor: <span class="math-style">3 · (4 + 5)</span>.<br>• Paso 2: Operamos el paréntesis: <span class="math-style">3 · (9)</span>.<br>• Paso 3: Multiplicamos: <span class="math-style">27</span>.' }
+    ];
+
+    // VARIABLES DE ESTADO DE LA APLICACIÓN
+    let history = []; // Almacena los índices de los ejercicios que ya han salido
+    let currentExercise = null;
+
+    // Inicializar al cargar el documento
+    window.onload = function() {
+        loadNextExercise();
+    };
+
+    function loadNextExercise() {
+        // Ocultar paneles informativos previos
+        document.getElementById('hint-panel').style.display = 'none';
+        document.getElementById('solution-panel').style.display = 'none';
+
+        // Si ya hemos visto todos los ejercicios de la lista, reiniciamos el historial para que vuelva a empezar
+        if (history.length >= database.length) {
+            history = [];
+        }
+
+        let randomIndex;
+        // Buscar un índice que no se haya mostrado todavía en esta ronda
+        do {
+            randomIndex = Math.floor(Math.random() * database.length);
+        } while (history.includes(randomIndex));
+
+        // Registrar en el historial y asignar ejercicio activo
+        history.push(randomIndex);
+        currentExercise = database[randomIndex];
+
+        // Renderizar elementos en pantalla
+        document.getElementById('ex-number').innerText = `Reto Aleatorio (Original Nº ${currentExercise.id})`;
+        document.getElementById('ex-text').innerHTML = currentExercise.text;
+
+        // Actualizar datos de progreso de la sesión
+        document.getElementById('counter-display').innerText = `Ejercicios vistos en esta ronda: ${history.length} / ${database.length}`;
+        const percentage = (history.length / database.length) * 100;
+        document.getElementById('progress-fill').style.width = `${percentage}%`;
+    }
+
+    function showHint() {
+        const panel = document.getElementById('hint-panel');
+        document.getElementById('solution-panel').style.display = 'none'; // ocultar el otro panel
+        
+        panel.innerHTML = currentExercise.hint;
+        panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
+    }
+
+    function showSolution() {
+        const panel = document.getElementById('solution-panel');
+        document.getElementById('hint-panel').style.display = 'none'; // ocultar el otro panel
+        
+        panel.innerHTML = currentExercise.sol;
+        panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
+    }
+
+    // Navegación entre pestañas (Teoría vs Práctica)
+    function switchTab(tabId) {
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+        
+        document.getElementById(tabId).classList.add('active');
+        event.currentTarget.classList.add('active');
+    }
+</script>
+</body>
+</html>

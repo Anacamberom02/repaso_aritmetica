@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nivel 3: Multiplicación y División (Modo Aleatorio)</title>
+    <style>
+        :root {
+            --primary: #b45309;
+            --primary-light: #fef3c7;
+            --accent: #4f46e5;
+            --accent-light: #e0e7ff;
+            --background: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #0f172a;
+            --text-muted: #475569;
+            --border: #e2e8f0;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+        body { background-color: var(--background); color: var(--text); padding: 20px; line-height: 1.5; }
+        .container { max-width: 850px; margin: 0 auto; }
+        
+        .back-link { display: inline-flex; align-items: center; text-decoration: none; color: var(--primary); font-weight: 600; margin-bottom: 20px; font-size: 0.95rem; }
+        h2 { font-size: 1.8rem; margin-bottom: 25px; color: var(--text); display: flex; align-items: center; gap: 10px; }
+        
+        /* Pestañas */
+        .tabs { display: flex; gap: 10px; margin-bottom: 25px; border-bottom: 2px solid var(--border); padding-bottom: 10px; }
+        .tab-btn { padding: 10px 20px; border: none; background: none; font-size: 1rem; font-weight: 600; color: var(--text-muted); cursor: pointer; border-radius: 8px; transition: all 0.2s; }
+        .tab-btn.active { background-color: var(--primary); color: white; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* Teoría */
+        .theory-section { background: var(--card-bg); padding: 25px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02); }
+        .theory-block { margin-bottom: 25px; padding-bottom: 20px; border-bottom: 1px dashed var(--border); }
+        .theory-block:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+        .theory-block h3 { color: var(--primary); margin-bottom: 10px; font-size: 1.25rem; }
+        .example-box { background-color: #fafafa; border-left: 4px solid var(--accent); padding: 12px; margin: 10px 0; border-radius: 0 8px 8px 0; font-style: italic; }
+
+        /* Contenedor del Generador */
+        .generator-container { background: var(--card-bg); border-radius: 16px; border: 1px solid var(--border); padding: 30px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); position: relative; }
+        
+        /* Control de sesión y progreso */
+        .session-info { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; font-size: 0.9rem; color: var(--text-muted); font-weight: 600; }
+        .progress-bar-bg { background-color: var(--border); height: 6px; width: 100%; border-radius: 3px; margin-bottom: 25px; overflow: hidden; }
+        .progress-bar-fill { background-color: var(--primary); height: 100%; width: 0%; transition: width 0.3s ease; }
+
+        /* Tarjeta Ejercicio */
+        .active-exercise-box { min-height: 180px; }
+        .exercise-meta { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; }
+        .exercise-id { font-weight: 700; color: var(--primary); font-size: 0.85rem; background: var(--primary-light); padding: 3px 10px; border-radius: 6px; }
+        .difficulty-tag { font-size: 0.8rem; font-weight: 600; padding: 2px 8px; border-radius: 4px; }
+        .diff-baja { background-color: #d1fae5; color: #065f46; }
+        .diff-media { background-color: #fef3c7; color: #92400e; }
+        .diff-alta { background-color: #fee2e2; color: #991b1b; }
+        .exercise-text { font-size: 1.25rem; font-weight: 600; margin-bottom: 25px; color: #1e293b; line-height: 1.6; }
+        
+        /* Botoneras */
+        .interaction-area { display: flex; justify-content: space-between; align-items: center; gap: 15px; flex-wrap: wrap; border-top: 1px solid var(--border); padding-top: 20px; margin-top: 25px; }
+        .sub-actions { display: flex; gap: 10px; }
+        
+        .btn-base { padding: 10px 20px; border: 1px solid var(--border); border-radius: 8px; font-weight: 600; font-size: 0.9rem; cursor: pointer; transition: all 0.2s; }
+        .btn-hint { background: #f1f5f9; color: var(--text-muted); }
+        .btn-hint:hover { background: var(--primary-light); color: var(--primary); border-color: var(--primary); }
+        .btn-solution { background: #f1f5f9; color: var(--text-muted); }
+        .btn-solution:hover { background: #d1fae5; color: #065f46; border-color: #a7f3d0; }
+        
+        .btn-next { background-color: var(--primary); color: white; border: none; box-shadow: 0 4px 6px -1px rgba(180, 83, 9, 0.2); }
+        .btn-next:hover { background-color: #92400e; transform: translateX(2px); }
+
+        /* Desplegables */
+        .info-box { display: none; margin-top: 20px; padding: 15px; border-radius: 10px; font-size: 1rem; animation: slideDown 0.25s ease-out; line-height: 1.6; }
+        .hint-box { background-color: var(--primary-light); color: #92400e; border-left: 5px solid var(--primary); }
+        .solution-box { background-color: #f0fdf4; color: #166534; border-left: 5px solid #22c55e; }
+        .math-style { font-family: 'Times New Roman', Times, serif; font-style: italic; font-weight: bold; font-size: 1.25rem; color: #1e293b; }
+
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <a href="../index.html" class="back-link">← Volver al Índice Principal</a>
+    
+    <h2>Nivel 3: Multiplicación y División de Monomios</h2>
+    
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('practica')">🏋️ Entrenador Aleatorio</button>
+        <button class="tab-btn" onclick="switchTab('teoria')">📖 Contenidos Teóricos</button>
+    </div>
+
+    <div id="teoria" class="tab-content">
+        <div class="theory-section">
+            <div class="theory-block">
+                <h3>1. Multiplicación de Monomios</h3>
+                <p>Para multiplicar monomios **NO hace falta que sean semejantes**. Se siguen dos pasos claros:</p>
+                <p>1º Multiplicar los coeficientes (los números de delante) entre sí.</p>
+                <p>2º Multiplicar las letras sumando sus exponentes (propiedad de las potencias de igual base).</p>
+                <div class="example-box">
+                    Ejemplo: <span class="math-style">(3x²) · (5x³)</span><br>
+                    • Números: <span class="math-style">3 · 5 = 15</span><br>
+                    • Letras: <span class="math-style">x² · x³ = x²⁺³ = x⁵</span><br>
+                    • Resultado final: <span class="math-style">15x⁵</span>
+                </div>
+            </div>
+            <div class="theory-block">
+                <h3>2. División de Monomios</h3>
+                <p>Para dividir monomios, dividimos los coeficientes y **restamos los exponentes** de las letras que sean iguales.</p>
+                <div class="example-box">
+                    Ejemplo: <span class="math-style">12x⁵ : 3x²</span><br>
+                    • Números: <span class="math-style">12 : 3 = 4</span><br>
+                    • Letras: <span class="math-style">x⁵ : x² = x⁵⁻² = x³</span><br>
+                    • Resultado final: <span class="math-style">4x³</span>
+                </div>
+            </div>
+            <div class="theory-block">
+                <h3>3. Propiedad Distributiva (Número por Polinomio)</h3>
+                <p>Cuando un número multiplica a un paréntesis con sumas o restas dentro, el número **multiplica a cada uno** de los elementos del interior del paréntesis.</p>
+                <div class="example-box">
+                    Ejemplo: <span class="math-style">4 · (2x + 3)</span><br>
+                    • Primero por el primero: <span class="math-style">4 · 2x = 8x</span><br>
+                    • Primero por el segundo: <span class="math-style">4 · 3 = 12</span><br>
+                    • Resultado final: <span class="math-style">8x + 12</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="practica" class="tab-content active">
+        <div class="generator-container">
+            
+            <div class="session-info">
+                <span>Modo Entrenamiento Activo</span>
+                <span id="counter-display">Ejercicios vistos: 0 / 25</span>
+            </div>
+            
+            <div class="progress-bar-bg">
+                <div id="progress-fill" class="progress-bar-fill"></div>
+            </div>
+
+            <div class="active-exercise-box">
+                <div class="exercise-meta">
+                    <span id="ex-number" class="exercise-id">Ejercicio --</span>
+                    <span id="ex-diff" class="difficulty-tag">Dif</span>
+                </div>
+                <div id="ex-text" class="exercise-text">Cargando retos matemáticos...</div>
+            </div>
+
+            <div id="hint-panel" class="info-box hint-box"></div>
+            <div id="solution-panel" class="info-box solution-box"></div>
+
+            <div class="interaction-area">
+                <div class="sub-actions">
+                    <button class="btn-base btn-hint" onclick="showHint()">💡 Ver Pista</button>
+                    <button class="btn-base btn-solution" onclick="showSolution()">📝 Solución Paso a Paso</button>
+                </div>
+                <button class="btn-base btn-next" onclick="loadNextExercise()">Saltar Ejercicio ➡️</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    // BANCO DE DATOS DEL NIVEL 3 (EJERCICIOS 51 AL 75)
+    const database = [
+        { id: 51, diff: 'baja', diffText: 'Iniciación', text: 'Resuelve el producto: <span class="math-style">3 · (2x)</span>.', hint: 'Multiplica el número suelto por el coeficiente de la x. La letra x no cambia porque no se multiplica por otra letra.', sol: '<strong>Respuesta:</strong> <span class="math-style">6x</span><br>• Paso 1: Multiplicamos los coeficientes: <span class="math-style">3 · 2 = 6</span>.<br>• Paso 2: Mantendremos la variable x al no haber otra letra: <span class="math-style">6x</span>.' },
+        { id: 52, diff: 'baja', diffText: 'Iniciación', text: 'Multiplica los monomios lineales: <span class="math-style">x · x</span>.', hint: 'Cada x tiene un exponente invisible igual a 1 (x¹). Al multiplicar bases iguales, se suman sus exponentes.', sol: '<strong>Respuesta:</strong> <span class="math-style">x²</span><br>• Paso 1: Identificamos exponentes implícitos: <span class="math-style">x¹ · x¹</span>.<br>• Paso 2: Sumamos exponentes: <span class="math-style">1 + 1 = 2</span>. Obtenemos <span class="math-style">x²</span>.' },
+        { id: 53, diff: 'baja', diffText: 'Iniciación', text: 'Calcula el producto: <span class="math-style">2x · 4x</span>.', hint: 'Multiplica los números (2 · 4) por un lado, y las letras (x · x) por otro sumando sus exponentes.', sol: '<strong>Respuesta:</strong> <span class="math-style">8x²</span><br>• Paso 1: Multiplicamos los coeficientes: <span class="math-style">2 · 4 = 8</span>.<br>• Paso 2: Multiplicamos las variables: <span class="math-style">x¹ · x¹ = x²</span>.<br>• Paso 3: Unimos los resultados: <span class="math-style">8x²</span>.' },
+        { id: 54, diff: 'baja', diffText: 'Iniciación', text: 'Resuelve la multiplicación: <span class="math-style">5x² · 3x</span>.', hint: 'Recuerda que la x del segundo término es equivalente a x¹. Suma los exponentes: 2 + 1.', sol: '<strong>Respuesta:</strong> <span class="math-style">15x³</span><br>• Paso 1: Coeficientes: <span class="math-style">5 · 3 = 15</span>.<br>• Paso 2: Parte literal: <span class="math-style">x² · x¹ = x²⁺¹ = x³</span>.<br>• Paso 3: Juntamos: <span class="math-style">15x³</span>.' },
+        { id: 55, diff: 'baja', diffText: 'Iniciación', text: 'Calcula: <span class="math-style">a³ · a²</span>.', hint: 'No hay números delante (coeficiente 1). Aplica directamente la suma de exponentes de la letra a.', sol: '<strong>Respuesta:</strong> <span class="math-style">a⁵</span><br>• Paso 1: Al multiplicar bases iguales, sumamos exponentes de las letras: <span class="math-style">3 + 2 = 5</span>. Resultado: <span class="math-style">a⁵</span>.' },
+        { id: 56, diff: 'baja', diffText: 'Iniciación', text: 'Multiplica monomios de distinto grado: <span class="math-style">2x⁴ · 6x²</span>.', hint: 'Multiplica coeficientes normalmente y luego suma los exponentes de las x de forma normal.', sol: '<strong>Respuesta:</strong> <span class="math-style">12x⁶</span><br>• Paso 1: Multiplicamos coeficientes: <span class="math-style">2 · 6 = 12</span>.<br>• Paso 2: Sumamos exponentes: <span class="math-style">4 + 2 = 6</span>. Obtenemos <span class="math-style">12x⁶</span>.' },
+        { id: 57, diff: 'baja', diffText: 'Iniciación', text: 'Opera con letras distintas: <span class="math-style">2x · 3y</span>.', hint: 'Multiplica los números. Como las letras son diferentes (x e y), no se pueden sumar exponentes; se dejan escritas juntas.', sol: '<strong>Respuesta:</strong> <span class="math-style">6xy</span><br>• Paso 1: Coeficientes: <span class="math-style">2 · 3 = 6</span>.<br>• Paso 2: Al ser letras distintas, su producto simplemente se indica uniéndolas: <span class="math-style">xy</span>. Resultado: <span class="math-style">6xy</span>.' },
+        { id: 58, diff: 'baja', diffText: 'Iniciación', text: 'Calcula el producto de tres elementos: <span class="math-style">2x · x · 3x</span>.', hint: 'La x del medio tiene un 1 delante y un 1 como exponente. Multiplica los tres números y suma los tres exponentes.', sol: '<strong>Respuesta:</strong> <span class="math-style">6x³</span><br>• Paso 1: Expresión extendida: <span class="math-style">2x¹ · 1x¹ · 3x¹</span>.<br>• Paso 2: Coeficientes: <span class="math-style">2 · 1 · 3 = 6</span>.<br>• Paso 3: Exponentes: <span class="math-style">1 + 1 + 1 = 3</span>. Resultado: <span class="math-style">6x³</span>.' },
+        
+        { id: 59, diff: 'media', diffText: 'Consolidación', text: 'Resuelve la división: <span class="math-style">10x : 2</span>.', hint: 'Divide únicamente el coeficiente 10 entre el número 2. La letra x se queda acompañando al resultado.', sol: '<strong>Respuesta:</strong> <span class="math-style">5x</span><br>• Paso 1: Dividimos la parte numérica: <span class="math-style">10 : 2 = 5</span>.<br>• Paso 2: La x no tiene otra letra por la cual dividirse, se mantiene: <span class="math-style">5x</span>.' },
+        { id: 60, diff: 'media', diffText: 'Consolidación', text: 'Divide monomios idénticos: <span class="math-style">4x : 4x</span>.', hint: 'Cualquier cantidad o expresión dividida entre sí misma es siempre igual a...', sol: '<strong>Respuesta:</strong> <span class="math-style">1</span><br>• Paso 1: Dividimos coeficientes: <span class="math-style">4 : 4 = 1</span>.<br>• Paso 2: Letras: <span class="math-style">x¹ : x¹ = x¹⁻¹ = x⁰ = 1</span>. Como <span class="math-style">1 · 1 = 1</span>, las letras desaparecen por completo.' },
+        { id: 61, diff: 'media', diffText: 'Consolidación', text: 'Resuelve la división: <span class="math-style">8x³ : 2x</span>.', hint: 'Divide los números (8:2) y resta los exponentes de las letras (recuerda que la x divisora tiene exponente 1).', sol: '<strong>Respuesta:</strong> <span class="math-style">4x²</span><br>• Paso 1: Coeficientes: <span class="math-style">8 : 2 = 4</span>.<br>• Paso 2: Exponentes de las letras: <span class="math-style">3 - 1 = 2</span> (<span class="math-style">x²</span>). Resultado: <span class="math-style">4x²</span>.' },
+        { id: 62, diff: 'media', diffText: 'Consolidación', text: 'Opera con signos negativos: <span class="math-style">(-2x²) · 4x³</span>.', hint: 'Aplica la regla de los signos para el producto numérico: menos por más es menos.', sol: '<strong>Respuesta:</strong> <span class="math-style">-8x⁵</span><br>• Paso 1: Coeficientes con signo: <span class="math-style">(-2) · 4 = -8</span>.<br>• Paso 2: Sumamos exponentes de las variables: <span class="math-style">2 + 3 = 5</span>. Resultado: <span class="math-style">-8x⁵</span>.' },
+        { id: 63, diff: 'media', diffText: 'Consolidación', text: 'Resuelve el cociente: <span class="math-style">15x⁵ : 3x²</span>.', hint: 'Divide los números delanteros de forma normal y resta los exponentes de las variables x.', sol: '<strong>Respuesta:</strong> <span class="math-style">5x³</span><br>• Paso 1: Coeficientes: <span class="math-style">15 : 3 = 5</span>.<br>• Paso 2: Variables: <span class="math-style">x⁵ : x² = x⁵⁻² = x³</span>. Resultado unificado: <span class="math-style">5x³</span>.' },
+        { id: 64, diff: 'media', diffText: 'Consolidación', text: 'Multiplica incluyendo coeficientes negativos en ambos lados: <span class="math-style">(-3x) · (-5x)</span>.', hint: 'Regla de los signos: menos por menos es más. Multiplica las cifras y suma exponentes de las x.', sol: '<strong>Respuesta:</strong> <span class="math-style">15x²</span><br>• Paso 1: Coeficientes: <span class="math-style">(-3) · (-5) = +15</span>.<br>• Paso 2: Variables: <span class="math-style">x¹ · x¹ = x²</span>. Resultado final: <span class="math-style">15x²</span>.' },
+        { id: 65, diff: 'media', diffText: 'Consolidación', text: 'Divide reduciendo las letras: <span class="math-style">-12x⁴ : 2x³</span>.', hint: 'Menos entre más resulta negativo. Divide las cifras y resta los exponentes correspondientes.', sol: '<strong>Respuesta:</strong> <span class="math-style">-6x</span> o <span class="math-style">-6x¹</span><br>• Paso 1: Coeficientes: <span class="math-style">-12 : 2 = -6</span>.<br>• Paso 2: Exponentes: <span class="math-style">4 - 3 = 1</span> (<span class="math-style">x¹</span>, que escribimos como x). Resultado: <span class="math-style">-6x</span>.' },
+        { id: 66, diff: 'media', diffText: 'Consolidación', text: 'Multiplica monomios complejos: <span class="math-style">2xy · 4x</span>.', hint: 'Multiplica los coeficientes. Suma los exponentes de las letras que sean iguales (la x). La y se queda sola al final.', sol: '<strong>Respuesta:</strong> <span class="math-style">8x²y</span><br>• Paso 1: Coeficientes: <span class="math-style">2 · 4 = 8</span>.<br>• Paso 2: Letra x $\rightarrow$ <span class="math-style">x¹ · x¹ = x²</span>.<br>• Paso 3: Letra y $\rightarrow$ se queda intacta. Juntando todo: <span class="math-style">8x²y</span>.' },
+        { id: 67, diff: 'media', diffText: 'Consolidación', text: 'Resuelve la división: <span class="math-style">6x²y : 2x</span>.', hint: 'Divide los números. Resta el exponente de la x del numerador con la x del denominador. La y no se altera.', sol: '<strong>Respuesta:</strong> <span class="math-style">3xy</span><br>• Paso 1: Coeficientes: <span class="math-style">6 : 2 = 3</span>.<br>• Paso 2: Letra x $\rightarrow$ <span class="math-style">x² : x¹ = x²⁻¹ = x¹</span> (es decir, x).<br>• Paso 3: La y se mantiene igual. Resultado: <span class="math-style">3xy</span>.' },
+        
+        { id: 68, diff: 'alta', diffText: 'Avanzado', text: 'Aplica propiedad distributiva: <span class="math-style">2 · (3x + 5)</span>.', hint: 'El número 2 debe multiplicar por separado a cada uno de los dos términos que están dentro del paréntesis.', sol: '<strong>Respuesta:</strong> <span class="math-style">6x + 10</span><br>• Paso 1: Multiplicamos el primer elemento: <span class="math-style">2 · 3x = 6x</span>.<br>• Paso 2: Multiplicamos el segundo elemento: <span class="math-style">2 · 5 = 10</span>.<br>• Paso 3: Escribimos el binomio resultante: <span class="math-style">6x + 10</span>.' },
+        { id: 69, diff: 'alta', diffText: 'Avanzado', text: 'Resuelve quitando paréntesis: <span class="math-style">5 · (x² - 2x)</span>.', hint: 'El 5 multiplica tanto a la x² como al término -2x. Mantén el signo menos intermedio.', sol: '<strong>Respuesta:</strong> <span class="math-style">5x² - 10x</span><br>• Paso 1: Multiplicamos el primer término: <span class="math-style">5 · x² = 5x²</span>.<br>• Paso 2: Multiplicamos el segundo término: <span class="math-style">5 · (-2x) = -10x</span>. Resultado: <span class="math-style">5x² - 10x</span>.' },
+        { id: 70, diff: 'alta', diffText: 'Avanzado', text: 'Aplica propiedad distributiva: <span class="math-style">3 · (2x² + 4x - 1)</span>.', hint: 'Esta vez el 3 multiplica a los tres términos del interior del trinomio uno por uno.', sol: '<strong>Respuesta:</strong> <span class="math-style">6x² + 12x - 3</span><br>• Paso 1: <span class="math-style">3 · 2x² = 6x²</span>.<br>• Paso 2: <span class="math-style">3 · 4x = 12x</span>.<br>• Paso 3: <span class="math-style">3 · (-1) = -3</span>. Juntamos los tres elementos: <span class="math-style">6x² + 12x - 3</span>.' },
+        { id: 71, diff: 'alta', diffText: 'Avanzado', text: 'Multiplica un monomio por un binomio: <span class="math-style">x · (2x + 4)</span>.', hint: '¡Cuidado! Ahora multiplicas por una letra. Aplica la distributiva: x · 2x (se suman exponentes) y luego x · 4.', sol: '<strong>Respuesta:</strong> <span class="math-style">2x² + 4x</span><br>• Paso 1: Multiplicamos el primero: <span class="math-style">x · 2x = 2x²</span>.<br>• Paso 2: Multiplicamos el segundo: <span class="math-style">x · 4 = 4x</span>. Resultado unificado: <span class="math-style">2x² + 4x</span>.' },
+        { id: 72, diff: 'alta', diffText: 'Avanzado', text: 'Aplica propiedad distributiva con un signo negativo delante: <span class="math-style">-2 · (4x - 3)</span>.', hint: 'El número multiplicador es -2. Ten mucho cuidado con los signos al multiplicar: cambia el signo de todo lo de dentro.', sol: '<strong>Respuesta:</strong> <span class="math-style">-8x + 6</span><br>• Paso 1: Primer producto: <span class="math-style">(-2) · 4x = -8x</span>.<br>• Paso 2: Segundo producto: <span class="math-style">(-2) · (-3) = +6</span> (menos por menos es más). Resultado: <span class="math-style">-8x + 6</span>.' },
+        { id: 73, diff: 'alta', diffText: 'Avanzado', text: 'Resuelve expandiendo la expresión: <span class="math-style">4 · (x + 3) - 5</span>.', hint: 'Primero haz la propiedad distributiva para romper el paréntesis. Al resultado numérico final le restas el 5 suelto.', sol: '<strong>Respuesta:</strong> <span class="math-style">4x + 7</span><br>• Paso 1: Rompemos el paréntesis: <span class="math-style">4 · x + 4 · 3 = 4x + 12</span>.<br>• Paso 2: Añadimos el -5 externo: <span class="math-style">4x + 12 - 5</span>.<br>• Paso 3: Reducimos los números sueltos: <span class="math-style">12 - 5 = 7</span>. Resultado: <span class="math-style">4x + 7</span>.' },
+        { id: 74, diff: 'alta', diffText: 'Avanzado', text: 'Simplifica la expresión con letras: <span class="math-style">2x · (x² + 3)</span>.', hint: 'El monomio exterior 2x multiplica a cada uno de los elementos internos de forma distributiva.', sol: '<strong>Respuesta:</strong> <span class="math-style">2x³ + 6x</span><br>• Paso 1: Multiplicamos el primer término: <span class="math-style">2x¹ · x² = 2x³</span>.<br>• Paso 2: Multiplicamos el segundo término: <span class="math-style">2x · 3 = 6x</span>. Resultado: <span class="math-style">2x³ + 6x</span>.' },
+        { id: 75, diff: 'alta', diffText: 'Avanzado', text: 'Reto final distributivo combinado: <span class="math-style">3 · (x + 2) + 2 · (x + 1)</span>.', hint: 'Aplica la propiedad distributiva de manera independiente en los dos paréntesis y luego agrupa las familias semejantes.', sol: '<strong>Respuesta:</strong> <span class="math-style">5x + 8</span><br>• Paso 1: Desarrollamos el primer bloque: <span class="math-style">3x + 6</span>.<br>• Paso 2: Desarrollamos el segundo bloque: <span class="math-style">2x + 2</span>.<br>• Paso 3: Juntamos la expresión entera: <span class="math-style">3x + 6 + 2x + 2</span>.<br>• Paso 4: Agrupamos las x (<span class="math-style">3x + 2x = 5x</span>) y los números (<span class="math-style">6 + 2 = 8</span>). Resultado: <span class="math-style">5x + 8</span>.' }
+    ];
+
+    let history = [];
+    let currentExercise = null;
+
+    window.onload = function() {
+        loadNextExercise();
+    };
+
+    function loadNextExercise() {
+        document.getElementById('hint-panel').style.display = 'none';
+        document.getElementById('solution-panel').style.display = 'none';
+
+        if (history.length >= database.length) {
+            history = [];
+        }
+
+        let randomIndex;
+        do {
+            randomIndex = Math.floor(Math.random() * database.length);
+        } while (history.includes(randomIndex));
+
+        history.push(randomIndex);
+        currentExercise = database[randomIndex];
+
+        document.getElementById('ex-number').innerText = `Reto Aleatorio (Original Nº ${currentExercise.id})`;
+        document.getElementById('ex-text').innerHTML = currentExercise.text;
+        
+        const diffBadge = document.getElementById('ex-diff');
+        diffBadge.innerText = currentExercise.diffText;
+        diffBadge.className = 'difficulty-tag';
+        if (currentExercise.diff === 'baja') diffBadge.classList.add('diff-baja');
+        if (currentExercise.diff === 'media') diffBadge.classList.add('diff-media');
+        if (currentExercise.diff === 'alta') diffBadge.classList.add('diff-alta');
+
+        document.getElementById('counter-display').innerText = `Ejercicios vistos en esta ronda: ${history.length} / ${database.length}`;
+        const percentage = (history.length / database.length) * 100;
+        document.getElementById('progress-fill').style.width = `${percentage}%`;
+    }
+
+    function showHint() {
+        const panel = document.getElementById('hint-panel');
+        document.getElementById('solution-panel').style.display = 'none';
+        panel.innerHTML = currentExercise.hint;
+        panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
+    }
+
+    function showSolution() {
+        const panel = document.getElementById('solution-panel');
+        document.getElementById('hint-panel').style.display = 'none';
+        panel.innerHTML = currentExercise.sol;
+        panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
+    }
+
+    function switchTab(tabId) {
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+        event.currentTarget.classList.add('active');
+    }
+</script>
+</body>
+</html>

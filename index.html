@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Álgebra Interactiva - 1º ESO</title>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #4338ca;
+            --secondary: #0ea5e9;
+            --background: #f8fafc;
+            --surface: #ffffff;
+            --text: #1e293b;
+            --text-muted: #64748b;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+        body { background-color: var(--background); color: var(--text); padding: 20px; line-height: 1.6; }
+        .container { max-width: 1100px; margin: 0 auto; }
+        header {
+            text-align: center;
+            padding: 50px 20px;
+            background: linear-gradient(135deg, #4f46e5 0%, #0ea5e9 100%);
+            color: white;
+            border-radius: 20px;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 25px -5px rgba(79, 70, 229, 0.2);
+        }
+        header h1 { font-size: 2.6rem; margin-bottom: 12px; font-weight: 800; }
+        header p { font-size: 1.2rem; opacity: 0.9; font-weight: 300; }
+        .grid-niveles { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 25px; }
+        .card-nivel {
+            background: var(--surface);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .card-nivel:hover { transform: translateY(-5px); box-shadow: 0 12px 24px -10px rgba(0, 0, 0, 0.1); }
+        .badge {
+            background-color: #e0e7ff; color: var(--primary);
+            padding: 6px 14px; border-radius: 9999px;
+            font-size: 0.8rem; font-weight: 700; display: inline-block; margin-bottom: 15px;
+        }
+        .card-nivel h3 { font-size: 1.4rem; margin-bottom: 12px; color: #0f172a; }
+        .card-nivel p { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 25px; flex-grow: 1; }
+        .btn {
+            display: block; text-align: center; color: white;
+            padding: 12px 24px; border-radius: 10px; text-decoration: none;
+            font-weight: 600; transition: background-color 0.2s;
+        }
+        footer { text-align: center; margin-top: 60px; color: var(--text-muted); font-size: 0.9rem; padding: 20px 0; border-top: 1px solid #e2e8f0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Entrenamiento de Álgebra</h1>
+            <p>100 Retos Interactivos de Monomios y Polinomios para 1º de la ESO</p>
+        </header>
+        <main class="grid-niveles">
+            
+            <div class="card-nivel">
+                <div>
+                    <span class="badge" style="background-color: #e0e7ff; color: #4f46e5;">Nivel 1</span>
+                    <h3>Lenguaje Algebraico</h3>
+                    <p>Traducción de enunciados verbales, identificación de partes de un monomio (coeficiente, variables, grado) y cálculo del valor numérico elemental.</p>
+                </div>
+                <a href="ejercicios_nivel1.html" class="btn" style="background-color: #4f46e5;">Empezar Práctica</a>
+            </div>
+
+            <div class="card-nivel">
+                <div>
+                    <span class="badge" style="background-color: #e0f2fe; color: #0369a1;">Nivel 2</span>
+                    <h3>Suma y Resta</h3>
+                    <p>Identificación avanzada de términos semejantes, reducción de cadenas de monomios y sumas/restas básicas de binomios por familias.</p>
+                </div>
+                <a href="ejercicios_nivel2.html" class="btn" style="background-color: #0ea5e9;">Empezar Práctica</a>
+            </div>
+
+            <div class="card-nivel">
+                <div>
+                    <span class="badge" style="background-color: #fef3c7; color: #b45309;">Nivel 3</span>
+                    <h3>Multiplicación y División</h3>
+                    <p>Uso de propiedades de las potencias para operar partes literales, cocientes de monomios y aplicación de la propiedad distributiva.</p>
+                </div>
+                <a href="ejercicios_nivel3.html" class="btn" style="background-color: #d97706;">Empezar Práctica</a>
+            </div>
+
+            <div class="card-nivel">
+                <div>
+                    <span class="badge" style="background-color: #d1fae5; color: #047857;">Nivel 4</span>
+                    <h3>Polinomios y Geometría</h3>
+                    <p>Operaciones combinadas completas con polinomios, eliminación crítica de paréntesis con signos negativos y modelización de perímetros y áreas.</p>
+                </div>
+                <a href="ejercicios_nivel4.html" class="btn" style="background-color: #047857;">Empezar Práctica</a>
+            </div>
+
+        </main>
+        <footer>
+            <p>Plataforma interactiva diseñada para potenciar el aprendizaje continuo en Matemáticas.</p>
+        </footer>
+    </div>
+</body>
+</html>

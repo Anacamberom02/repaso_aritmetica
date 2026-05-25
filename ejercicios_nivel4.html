@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nivel 4: Polinomios y Retos Finales (Modo Aleatorio)</title>
+    <style>
+        :root {
+            --primary: #047857;
+            --primary-light: #d1fae5;
+            --accent: #4f46e5;
+            --accent-light: #e0e7ff;
+            --background: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #0f172a;
+            --text-muted: #475569;
+            --border: #e2e8f0;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+        body { background-color: var(--background); color: var(--text); padding: 20px; line-height: 1.5; }
+        .container { max-width: 850px; margin: 0 auto; }
+        
+        .back-link { display: inline-flex; align-items: center; text-decoration: none; color: var(--primary); font-weight: 600; margin-bottom: 20px; font-size: 0.95rem; }
+        h2 { font-size: 1.8rem; margin-bottom: 25px; color: var(--text); display: flex; align-items: center; gap: 10px; }
+        
+        /* Pestañas */
+        .tabs { display: flex; gap: 10px; margin-bottom: 25px; border-bottom: 2px solid var(--border); padding-bottom: 10px; }
+        .tab-btn { padding: 10px 20px; border: none; background: none; font-size: 1rem; font-weight: 600; color: var(--text-muted); cursor: pointer; border-radius: 8px; transition: all 0.2s; }
+        .tab-btn.active { background-color: var(--primary); color: white; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* Teoría */
+        .theory-section { background: var(--card-bg); padding: 25px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02); }
+        .theory-block { margin-bottom: 25px; padding-bottom: 20px; border-bottom: 1px dashed var(--border); }
+        .theory-block:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+        .theory-block h3 { color: var(--primary); margin-bottom: 10px; font-size: 1.25rem; }
+        .example-box { background-color: #fafafa; border-left: 4px solid var(--accent); padding: 12px; margin: 10px 0; border-radius: 0 8px 8px 0; font-style: italic; }
+
+        /* Contenedor del Generador */
+        .generator-container { background: var(--card-bg); border-radius: 16px; border: 1px solid var(--border); padding: 30px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); position: relative; }
+        
+        /* Control de sesión y progreso */
+        .session-info { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; font-size: 0.9rem; color: var(--text-muted); font-weight: 600; }
+        .progress-bar-bg { background-color: var(--border); height: 6px; width: 100%; border-radius: 3px; margin-bottom: 25px; overflow: hidden; }
+        .progress-bar-fill { background-color: var(--primary); height: 100%; width: 0%; transition: width 0.3s ease; }
+
+        /* Tarjeta Ejercicio */
+        .active-exercise-box { min-height: 180px; }
+        .exercise-meta { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; }
+        .exercise-id { font-weight: 700; color: var(--primary); font-size: 0.85rem; background: var(--primary-light); padding: 3px 10px; border-radius: 6px; }
+        .difficulty-tag { font-size: 0.8rem; font-weight: 600; padding: 2px 8px; border-radius: 4px; }
+        .diff-baja { background-color: #d1fae5; color: #065f46; }
+        .diff-media { background-color: #fef3c7; color: #92400e; }
+        .diff-alta { background-color: #fee2e2; color: #991b1b; }
+        .exercise-text { font-size: 1.25rem; font-weight: 600; margin-bottom: 25px; color: #1e293b; line-height: 1.6; }
+        
+        /* Botoneras */
+        .interaction-area { display: flex; justify-content: space-between; align-items: center; gap: 15px; flex-wrap: wrap; border-top: 1px solid var(--border); padding-top: 20px; margin-top: 25px; }
+        .sub-actions { display: flex; gap: 10px; }
+        
+        .btn-base { padding: 10px 20px; border: 1px solid var(--border); border-radius: 8px; font-weight: 600; font-size: 0.9rem; cursor: pointer; transition: all 0.2s; }
+        .btn-hint { background: #f1f5f9; color: var(--text-muted); }
+        .btn-hint:hover { background: var(--primary-light); color: var(--primary); border-color: var(--primary); }
+        .btn-solution { background: #f1f5f9; color: var(--text-muted); }
+        .btn-solution:hover { background: #d1fae5; color: #065f46; border-color: #a7f3d0; }
+        
+        .btn-next { background-color: var(--primary); color: white; border: none; box-shadow: 0 4px 6px -1px rgba(4, 120, 87, 0.2); }
+        .btn-next:hover { background-color: #045840; transform: translateX(2px); }
+
+        /* Desplegables */
+        .info-box { display: none; margin-top: 20px; padding: 15px; border-radius: 10px; font-size: 1rem; animation: slideDown 0.25s ease-out; line-height: 1.6; }
+        .hint-box { background-color: var(--primary-light); color: #045840; border-left: 5px solid var(--primary); }
+        .solution-box { background-color: #f0fdf4; color: #166534; border-left: 5px solid #22c55e; }
+        .math-style { font-family: 'Times New Roman', Times, serif; font-style: italic; font-weight: bold; font-size: 1.25rem; color: #1e293b; }
+
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <a href="../index.html" class="back-link">← Volver al Índice Principal</a>
+    
+    <h2>Nivel 4: Reducción de Polinomios y Retos</h2>
+    
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('practica')">🏋️ Entrenador Aleatorio</button>
+        <button class="tab-btn" onclick="switchTab('teoria')">📖 Contenidos Teóricos</button>
+    </div>
+
+    <div id="teoria" class="tab-content">
+        <div class="theory-section">
+            <div class="theory-block">
+                <h3>1. Reducción y Ordenación Completa</h3>
+                <p>Para reducir expresiones algebraicas largas, agrupamos minuciosamente los monomios del mismo grado. Al terminar, es costumbre matemática ordenar el polinomio de **mayor a menor grado** (términos al cubo, al cuadrado, lineales e independientes).</p>
+            </div>
+            <div class="theory-block">
+                <h3>2. El Signo Menos (-) Delante de un Paréntesis</h3>
+                <p>Es uno de los puntos donde más fallos se cometen. Un signo menos justo delante de un paréntesis actúa eliminando el paréntesis pero **CAMBIANDO todos los signos** que se encuentran dentro.</p>
+                <div class="example-box">
+                    Ejemplo: <span class="math-style">5x - (2x - 3)</span><br>
+                    • El <span class="math-style">2x</span> pasa a ser <span class="math-style">-2x</span>.<br>
+                    • El <span class="math-style">-3</span> pasa a ser <span class="math-style">+3</span>.<br>
+                    • Queda: <span class="math-style">5x - 2x + 3 = 3x + 3</span>.
+                </div>
+            </div>
+            <div class="theory-block">
+                <h3>3. Modelización Algebraica de la Geometría</h3>
+                <p>Consiste en utilizar el álgebra para escribir fórmulas de perímetros (suma de lados) o áreas de figuras cuando no conocemos sus medidas numéricas reales, dejándolas en función de una variable <span class="math-style">x</span>.</p>
+                <div class="example-box">
+                    Un rectángulo de base <span class="math-style">x</span> y altura <span class="math-style">3</span> tiene:<br>
+                    • Perímetro = <span class="math-style">x + x + 3 + 3 = 2x + 6</span><br>
+                    • Área = base · altura = <span class="math-style">3 · x = 3x</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="practica" class="tab-content active">
+        <div class="generator-container">
+            
+            <div class="session-info">
+                <span>Modo Entrenamiento Activo</span>
+                <span id="counter-display">Ejercicios vistos: 0 / 25</span>
+            </div>
+            
+            <div class="progress-bar-bg">
+                <div id="progress-fill" class="progress-bar-fill"></div>
+            </div>
+
+            <div class="active-exercise-box">
+                <div class="exercise-meta">
+                    <span id="ex-number" class="exercise-id">Ejercicio --</span>
+                    <span id="ex-diff" class="difficulty-tag">Dif</span>
+                </div>
+                <div id="ex-text" class="exercise-text">Cargando retos matemáticos...</div>
+            </div>
+
+            <div id="hint-panel" class="info-box hint-box"></div>
+            <div id="solution-panel" class="info-box solution-box"></div>
+
+            <div class="interaction-area">
+                <div class="sub-actions">
+                    <button class="btn-base btn-hint" onclick="showHint()">💡 Ver Pista</button>
+                    <button class="btn-base btn-solution" onclick="showSolution()">📝 Solución Paso a Paso</button>
+                </div>
+                <button class="btn-base btn-next" onclick="loadNextExercise()">Saltar Ejercicio ➡️</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    // BANCO DE DATOS DEL NIVEL 4 (EJERCICIOS 76 AL 100)
+    const database = [
+        { id: 76, diff: 'baja', diffText: 'Iniciación', text: 'Reduce y ordena el siguiente polinomio: <span class="math-style">3x + 5x² - 2x + x²</span>.', hint: 'Agrupa las x² por un lado y las x por otro de forma separada. Al escribir el resultado, pon primero la familia de mayor exponente (x²).', sol: '<strong>Respuesta:</strong> <span class="math-style">6x² + x</span><br>• Paso 1: Agrupamos las <span class="math-style">x²</span>: <span class="math-style">5x² + 1x² = 6x²</span>.<br>• Paso 2: Agrupamos las <span class="math-style">x</span>: <span class="math-style">3x - 2x = 1x</span> (es decir, <span class="math-style">x</span>).<br>• Paso 3: Ordenamos colocando el mayor grado primero: <span class="math-style">6x² + x</span>.' },
+        { id: 77, diff: 'baja', diffText: 'Iniciación', text: 'Simplifica quitando el paréntesis con signo positivo: <span class="math-style">4x + (2x + 3)</span>.', hint: 'Cuando hay un signo + delante de un paréntesis, este se puede quitar directamente sin cambiar ningún signo del interior.', sol: '<strong>Respuesta:</strong> <span class="math-style">6x + 3</span><br>• Paso 1: Eliminamos el paréntesis manteniendo signos: <span class="math-style">4x + 2x + 3</span>.<br>• Paso 2: Agrupamos los términos semejantes en x: <span class="math-style">4x + 2x = 6x</span>.<br>• Paso 3: El número 3 se queda igual: <span class="math-style">6x + 3</span>.' },
+        { id: 78, diff: 'baja', diffText: 'Iniciación', text: 'Reduce el polinomio desordenado: <span class="math-style">9 + x - 4 - 3x</span>.', hint: 'Agrupa los números sueltos (9 - 4) por un lado y las variables x (1x - 3x) por otro lado.', sol: '<strong>Respuesta:</strong> <span class="math-style">-2x + 5</span><br>• Paso 1: Agrupamos las letras: <span class="math-style">1x - 3x = -2x</span>.<br>• Paso 2: Agrupamos números: <span class="math-style">9 - 4 = 5</span>.<br>• Paso 3: Ordenamos escribiendo la x en primer lugar: <span class="math-style">-2x + 5</span>.' },
+        { id: 79, diff: 'baja', diffText: 'Iniciación', text: 'Simplifica la expresión con un paréntesis al inicio: <span class="math-style">(x² + 4x) + 3x²</span>.', hint: 'El paréntesis no tiene ningún signo menos delante ni números multiplicando; puedes suprimirlo directamente.', sol: '<strong>Respuesta:</strong> <span class="math-style">4x² + 4x</span><br>• Paso 1: Quitamos el paréntesis: <span class="math-style">x² + 4x + 3x²</span>.<br>• Paso 2: Juntamos los elementos con cuadrados: <span class="math-style">1x² + 3x² = 4x²</span>.<br>• Paso 3: El término <span class="math-style">4x</span> se mantiene: <span class="math-style">4x² + 4x</span>.' },
+        { id: 80, diff: 'baja', diffText: 'Iniciación', text: 'Reduce por completo el trinomio: <span class="math-style">2x² - 5 + 3x² + 10</span>.', hint: 'Agrupa los términos con x² y por otra parte junta los números enteros teniendo mucho cuidado con sus signos (-5 + 10).', sol: '<strong>Respuesta:</strong> <span class="math-style">5x² + 5</span><br>• Paso 1: Agrupamos las <span class="math-style">x²</span>: <span class="math-style">2x² + 3x² = 5x²</span>.<br>• Paso 2: Agrupamos números: <span class="math-style">-5 + 10 = 5</span>.<br>• Paso 3: Combinamos los resultados obtenidos: <span class="math-style">5x² + 5</span>.' },
+        { id: 81, diff: 'baja', diffText: 'Iniciación', text: 'Simplifica eliminando términos nulos: <span class="math-style">4x - 3 + 2x + 3</span>.', hint: 'Observa detenidamente los números independientes aislados. ¿Qué pasa al operar -3 + 3?', sol: '<strong>Respuesta:</strong> <span class="math-style">6x</span><br>• Paso 1: Juntamos las variables x: <span class="math-style">4x + 2x = 6x</span>.<br>• Paso 2: Operamos los números sueltos: <span class="math-style">-3 + 3 = 0</span>.<br>• Paso 3: Como da cero, no se pone nada en la expresión final, quedando solo <span class="math-style">6x</span>.' },
+        { id: 82, diff: 'baja', diffText: 'Iniciación', text: 'Reduce la expresión con grado 3: <span class="math-style">x³ + 2x² - x³ + 4x²</span>.', hint: 'Agrupa las x³ (observarás que se cancelan) y luego suma de forma normal las x².', sol: '<strong>Respuesta:</strong> <span class="math-style">6x²</span><br>• Paso 1: Operamos los cubos: <span class="math-style">1x³ - 1x³ = 0</span>.<br>• Paso 2: Operamos los cuadrados: <span class="math-style">2x² + 4x² = 6x²</span>. Resultado: <span class="math-style">6x²</span>.' },
+        { id: 83, diff: 'baja', diffText: 'Iniciación', text: 'Simplifica la suma de binomios: <span class="math-style">(3x + 1) + (2x + 4)</span>.', hint: 'Elimina los dos paréntesis con total libertad al no tener signos menos ni multiplicaciones y agrupa las familias correspondientes.', sol: '<strong>Respuesta:</strong> <span class="math-style">5x + 5</span><br>• Paso 1: Reescribimos sin paréntesis: <span class="math-style">3x + 1 + 2x + 4</span>.<br>• Paso 2: Juntamos las x (<span class="math-style">3x + 2x = 5x</span>) y sumamos los números (<span class="math-style">1 + 4 = 5</span>). Resultado: <span class="math-style">5x + 5</span>.' },
+        
+        { id: 84, diff: 'media', diffText: 'Consolidación', text: 'Quita el paréntesis aplicando la regla crítica: <span class="math-style">5x - (2x + 4)</span>.', hint: '¡Alerta máxima! El signo menos que precede al paréntesis cambia el signo de TODOS los elementos de dentro. El 2x pasa a -2x y el +4 pasa a -4.', sol: '<strong>Respuesta:</strong> <span class="math-style">3x - 4</span><br>• Paso 1: Eliminamos el paréntesis invirtiendo los signos interiores: <span class="math-style">5x - 2x - 4</span>.<br>• Paso 2: Reducimos términos semejantes en x: <span class="math-style">5x - 2x = 3x</span>.<br>• Paso 3: Acoplamos el término independiente: <span class="math-style">3x - 4</span>.' },
+        { id: 85, diff: 'media', diffText: 'Consolidación', text: 'Simplifica la expresión: <span class="math-style">2x² - (x² - 3)</span>.', hint: 'El signo menos cambia el signo de la x² (a -x²) y también del -3, que se convertirá en un flamante +3.', sol: '<strong>Respuesta:</strong> <span class="math-style">x² + 3</span><br>• Paso 1: Quitamos el paréntesis aplicando el cambio de signo: <span class="math-style">2x² - x² + 3</span>.<br>• Paso 2: Operamos los cuadrados: <span class="math-style">2x² - 1x² = 1x²</span> (es decir, <span class="math-style">x²</span>).<br>• Paso 3: Agregamos el número libre: <span class="math-style">x² + 3</span>.' },
+        { id: 86, diff: 'media', diffText: 'Consolidación', text: 'Reduce la expresión combinada: <span class="math-style">3 · (2x + 4) - 4x</span>.', hint: 'Primero rompe el paréntesis aplicando la propiedad distributiva (multiplica el 3 por los dos elementos internos) y luego reduce restando las 4x.', sol: '<strong>Respuesta:</strong> <span class="math-style">2x + 12</span><br>• Paso 1: Multiplicamos de forma distributiva: <span class="math-style">3 · 2x + 3 · 4 = 6x + 12</span>.<br>• Paso 2: Colocamos el término restante: <span class="math-style">6x + 12 - 4x</span>.<br>• Paso 3: Agrupamos las variables x: <span class="math-style">6x - 4x = 2x</span>. Resultado final: <span class="math-style">2x + 12</span>.' },
+        { id: 87, diff: 'media', diffText: 'Consolidación', text: 'Simplifica la siguiente resta de polinomios: <span class="math-style">(4x - 5) - (2x + 1)</span>.', hint: 'El primer paréntesis se quita igual. El segundo paréntesis está precedido por un signo menos, cambia el signo de sus dos elementos.', sol: '<strong>Respuesta:</strong> <span class="math-style">2x - 6</span><br>• Paso 1: Eliminamos paréntesis: <span class="math-style">4x - 5 - 2x - 1</span>.<br>• Paso 2: Agrupamos las variables x: <span class="math-style">4x - 2x = 2x</span>.<br>• Paso 3: Agrupamos los números enteros: <span class="math-style">-5 - 1 = -6</span>. Resultado: <span class="math-style">2x - 6</span>.' },
+        { id: 88, diff: 'media', diffText: 'Consolidación', text: 'Reduce la expresión compleja: <span class="math-style">x² + 3x - (2x² - x)</span>.', hint: 'El signo menos cambia los signos interiores del paréntesis: el 2x² pasa a -2x² y el -x pasa a +x.', sol: '<strong>Respuesta:</strong> <span class="math-style">-x² + 4x</span><br>• Paso 1: Apertura del paréntesis: <span class="math-style">x² + 3x - 2x² + x</span>.<br>• Paso 2: Agrupamos los cuadrados: <span class="math-style">1x² - 2x² = -1x²</span> (es decir, <span class="math-style">-x²</span>).<br>• Paso 3: Agrupamos los términos lineales: <span class="math-style">3x + 1x = 4x</span>. Resultado: <span class="math-style">-x² + 4x</span>.' },
+        { id: 89, diff: 'media', diffText: 'Consolidación', text: 'Opera y simplifica al máximo: <span class="math-style">10 - 2 · (x + 3)</span>.', hint: '¡Cuidado con la jerarquía! Jamás hagas 10 - 2. Primero debes hacer la multiplicación distributiva de -2 por el paréntesis.', sol: '<strong>Respuesta:</strong> <span class="math-style">-2x + 4</span><br>• Paso 1: Distribuimos el -2 en el paréntesis: <span class="math-style">-2 · x - 2 · 3 = -2x - 6</span>.<br>• Paso 2: Juntamos con el 10 inicial: <span class="math-style">10 - 2x - 6</span>.<br>• Paso 3: Reducimos números sueltos (<span class="math-style">10 - 6 = 4</span>) y ordenamos: <span class="math-style">-2x + 4</span>.' },
+        { id: 90, diff: 'media', diffText: 'Consolidación', text: 'Reduce el polinomio con doble paréntesis: <span class="math-style">(x + 5) - (x - 2)</span>.', hint: 'El signo menos central cambia el signo de la segunda x y del -2 (convirtiéndolo en +2). Observa qué pasa con las x.', sol: '<strong>Respuesta:</strong> <span class="math-style">7</span><br>• Paso 1: Rompemos estructuras: <span class="math-style">x + 5 - x + 2</span>.<br>• Paso 2: Juntamos las x: <span class="math-style">1x - 1x = 0</span> (desaparecen las letras).<br>• Paso 3: Juntamos números: <span class="math-style">5 + 2 = 7</span>. El resultado es simplemente un número.' },
+        { id: 91, diff: 'media', diffText: 'Consolidación', text: 'Simplifica la expresión: <span class="math-style">4 · (x² + 1) - (2x² - 3)</span>.', hint: 'Aplica propiedad distributiva en el primer bloque (multiplica por 4) y cambia de signo el contenido del segundo bloque por el signo menos exterior.', sol: '<strong>Respuesta:</strong> <span class="math-style">2x² + 7</span><br>• Paso 1: Desarrollamos el primer bloque: <span class="math-style">4x² + 4</span>.<br>• Paso 2: Abrimos el segundo bloque cambiando signos: <span class="math-style">-2x² + 3</span>.<br>• Paso 3: Juntamos todo: <span class="math-style">4x² + 4 - 2x² + 3</span>.<br>• Paso 4: Reducimos: <span class="math-style">4x² - 2x² = 2x²</span> y <span class="math-style">4 + 3 = 7</span>. Resultado: <span class="math-style">2x² + 7</span>.' },
+        { id: 92, diff: 'media', diffText: 'Consolidación', text: 'Reduce expandiendo los paréntesis: <span class="math-style">2 · (x + 3) - 3 · (x - 1)</span>.', hint: 'Multiplica el 2 de forma distributiva en el primero, y luego distribuye el -3 completo en el segundo paréntesis (cambiando sus signos internos).', sol: '<strong>Respuesta:</strong> <span class="math-style">-x + 9</span><br>• Paso 1: Primer paréntesis: <span class="math-style">2x + 6</span>.<br>• Paso 2: Segundo paréntesis: <span class="math-style">-3x + 3</span> (¡ojo, <span class="math-style">-3 · -1 = +3</span>!).<br>• Paso 3: Unión: <span class="math-style">2x + 6 - 3x + 3</span>.<br>• Paso 4: Reducción: <span class="math-style">2x - 3x = -1x</span> (es decir, <span class="math-style">-x</span>) y <span class="math-style">6 + 3 = 9</span>. Resultado: <span class="math-style">-x + 9</span>.' },
+        
+        { id: 93, diff: 'alta', diffText: 'Reto Geométrico', text: 'Un cuadrado tiene un lado que mide <span class="math-style">x</span> unidades. Expresa algebraicamente su **Perímetro**.', hint: 'El perímetro es la suma de todos los lados de la figura. Un cuadrado tiene exactamente 4 lados idénticos.', sol: '<strong>Respuesta:</strong> <span class="math-style">4x</span><br>• Paso 1: Perímetro = Lado + Lado + Lado + Lado.<br>• Paso 2: Sabiendo que miden x: <span class="math-style">x + x + x + x = 4x</span>.' },
+        { id: 94, diff: 'alta', diffText: 'Reto Geométrico', text: 'El lado de un cuadrado mide <span class="math-style">x</span> unidades. Expresa algebraicamente su **Área**.', hint: 'La fórmula estándar del área de un cuadrado es lado multiplicado por lado (lado · lado). Aplica las propiedades de las potencias.', sol: '<strong>Respuesta:</strong> <span class="math-style">x²</span><br>• Paso 1: Fórmula: Área = Lado · Lado.<br>• Paso 2: Sustituimos por la variable: <span class="math-style">x · x</span>.<br>• Paso 3: Sumando exponentes invisibles (1+1): <span class="math-style">x²</span>.' },
+        { id: 95, diff: 'alta', diffText: 'Reto Geométrico', text: 'Un rectángulo tiene una base que mide <span class="math-style">x</span> y una altura que mide <span class="math-style">5</span> unidades. Halla la expresión simplificada de su **Perímetro**.', hint: 'Un rectángulo tiene dos bases iguales (x y x) y dos alturas iguales (5 y 5). Suma los cuatro lados y reduce.', sol: '<strong>Respuesta:</strong> <span class="math-style">2x + 10</span><br>• Paso 1: Planteamos la suma completa: Perímetro = <span class="math-style">x + x + 5 + 5</span>.<br>• Paso 2: Agrupamos términos semejantes en x: <span class="math-style">x + x = 2x</span>.<br>• Paso 3: Sumamos las cifras numéricas: <span class="math-style">5 + 5 = 10</span>. Resultado: <span class="math-style">2x + 10</span>.' },
+        { id: 96, diff: 'alta', diffText: 'Reto Geométrico', text: 'Encuentra la expresión del **Área** de un rectángulo cuya base mide <span class="math-style">x</span> y su altura mide <span class="math-style">7</span> unidades.', hint: 'El área de los rectángulos se calcula multiplicando la medida de la base por la medida de la altura (base · altura).', sol: '<strong>Respuesta:</strong> <span class="math-style">7x</span><br>• Paso 1: Área = Base · Altura.<br>• Paso 2: Sustituimos valores: <span class="math-style">x · 7</span>.<br>• Paso 3: Por convención matemática, se coloca siempre el número delante de la letra: <span class="math-style">7x</span>.' },
+        { id: 97, diff: 'alta', diffText: 'Reto Geométrico', text: 'La base de un rectángulo mide el doble que su altura <span class="math-style">x</span>. Expresa el **Perímetro** en función de dicha altura.', hint: 'Si la altura es x, la base mide el doble, es decir, 2x. El rectángulo tiene dos alturas (x) y dos bases (2x). Súmalos todos.', sol: '<strong>Respuesta:</strong> <span class="math-style">6x</span><br>• Paso 1: Identificamos lados: Alturas = <span class="math-style">x, x</span> | Bases = <span class="math-style">2x, 2x</span>.<br>• Paso 2: Sumamos los 4 lados para hallar el perímetro: <span class="math-style">x + x + 2x + 2x</span>.<br>• Paso 3: Como todos los monomios son semejantes, sumamos coeficientes (1+1+2+2): <span class="math-style">6x</span>.' },
+        { id: 98, diff: 'alta', diffText: 'Reto Geométrico', text: 'Un triángulo equilátero tiene un lado que mide <span class="math-style">2x + 3</span>. Halla la expresión reducida que define su **Perímetro**.', hint: 'Un triángulo equilátero tiene tres lados perfectamente idénticos. Multiplica por 3 la expresión de su lado usando la propiedad distributiva.', sol: '<strong>Respuesta:</strong> <span class="math-style">6x + 9</span><br>• Paso 1: El perímetro es tres veces el lado: <span class="math-style">3 · (2x + 3)</span>.<br>• Paso 2: Aplicamos la propiedad distributiva: <span class="math-style">3 · 2x = 6x</span> y <span class="math-style">3 · 3 = 9</span>.<br>• Paso 3: Juntamos los términos: <span class="math-style">6x + 9</span>.' },
+        { id: 99, diff: 'alta', diffText: 'Reto Geométrico', text: 'Expresa el **Área** de un triángulo cuya base mide <span class="math-style">2x</span> y cuya altura mide <span class="math-style">6</span> unidades.', hint: 'La fórmula del área del triángulo es (base · altura) dividido entre 2. Multiplica primero las expresiones de arriba y luego simplifica dividiendo.', sol: '<strong>Respuesta:</strong> <span class="math-style">6x</span><br>• Paso 1: Planteamos la fórmula estándar: <span class="math-style">Área = (Base · Altura) / 2</span>.<br>• Paso 2: Colocamos nuestros datos algebraicos: <span class="math-style">(2x · 6) / 2</span>.<br>• Paso 3: Multiplicamos el numerador: <span class="math-style">12x / 2</span>.<br>• Paso 4: Dividimos el coeficiente numérico entre dos: <span class="math-style">12 : 2 = 6</span>. Resultado: <span class="math-style">6x</span>.' },
+        { id: 100, diff: 'alta', diffText: 'Reto Geométrico', text: 'Reto Final: Un rectángulo tiene una base que mide <span class="math-style">x + 4</span> y una altura que mide <span class="math-style">3</span>. Expresa simplificado su **Perímetro**.', hint: 'El rectángulo tiene dos lados que miden (x + 4) y otros dos lados que miden 3. Suma los cuatro componentes y reduce las familias resultantes.', sol: '<strong>Respuesta:</strong> <span class="math-style">2x + 14</span><br>• Paso 1: Sumamos los cuatro lados: Perímetro = <span class="math-style">(x + 4) + (x + 4) + 3 + 3</span>.<br>• Paso 2: Rompemos los paréntesis limpios: <span class="math-style">x + 4 + x + 4 + 3 + 3</span>.<br>• Paso 3: Agrupamos las variables x: <span class="math-style">1x + 1x = 2x</span>.<br>• Paso 4: Sumamos todos los números independientes: <span class="math-style">4 + 4 + 3 + 3 = 14</span>. Expresión unificada: <span class="math-style">2x + 14</span>.' }
+    ];
+
+    let history = [];
+    let currentExercise = null;
+
+    window.onload = function() {
+        loadNextExercise();
+    };
+
+    function loadNextExercise() {
+        document.getElementById('hint-panel').style.display = 'none';
+        document.getElementById('solution-panel').style.display = 'none';
+
+        if (history.length >= database.length) {
+            history = [];
+        }
+
+        let randomIndex;
+        do {
+            randomIndex = Math.floor(Math.random() * database.length);
+        } while (history.includes(randomIndex));
+
+        history.push(randomIndex);
+        currentExercise = database[randomIndex];
+
+        document.getElementById('ex-number').innerText = `Reto Aleatorio (Original Nº ${currentExercise.id})`;
+        document.getElementById('ex-text').innerHTML = currentExercise.text;
+        
+        const diffBadge = document.getElementById('ex-diff');
+        diffBadge.innerText = currentExercise.diffText;
+        diffBadge.className = 'difficulty-tag';
+        if (currentExercise.diff === 'baja') diffBadge.classList.add('diff-baja');
+        if (currentExercise.diff === 'media') diffBadge.classList.add('diff-media');
+        if (currentExercise.diff === 'alta') diffBadge.classList.add('diff-alta');
+
+        document.getElementById('counter-display').innerText = `Ejercicios vistos en esta ronda: ${history.length} / ${database.length}`;
+        const percentage = (history.length / database.length) * 100;
+        document.getElementById('progress-fill').style.width = `${percentage}%`;
+    }
+
+    function showHint() {
+        const panel = document.getElementById('hint-panel');
+        document.getElementById('solution-panel').style.display = 'none';
+        panel.innerHTML = currentExercise.hint;
+        panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
+    }
+
+    function showSolution() {
+        const panel = document.getElementById('solution-panel');
+        document.getElementById('hint-panel').style.display = 'none';
+        panel.innerHTML = currentExercise.sol;
+        panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
+    }
+
+    function switchTab(tabId) {
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+        event.currentTarget.classList.add('active');
+    }
+</script>
+</body>
+</html>
